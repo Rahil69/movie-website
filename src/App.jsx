@@ -2,7 +2,6 @@ import React, { useEffect,useState } from 'react'
 import Search from './components/Search'
 import Spinner from './components/Spinner'
 import MovieCard from './components/MovieCard'
-import { useDebounce } from 'react-use'
 const API_BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const API_OPTIONS={
@@ -20,7 +19,13 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   // debounce thing that waits for the user to stop typing for 500ms so as to save api requests
-  useDebounce(() => setDebouncedSearchTerm(searchTerm),500,[searchTerm])
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchTerm])
 
   const fetchMovies = async (query='') => {
     setIsLoading(true);
@@ -61,7 +66,7 @@ const App = () => {
     <div className="pattern"/>
     <div className="wrapper">
       <header>
-        <img src="./hero.png" alt="nigger banner" />
+        <img src="./hero.png" alt="Movie search banner" />
         <h1>Find <span className="text-gradient">Movies</span> You'll Enjoy Without the Hassle</h1>
         <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </header>
